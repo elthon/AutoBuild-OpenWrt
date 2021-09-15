@@ -1,19 +1,12 @@
-#=================================================
-# Description: Build OpenWrt using GitHub Actions
-# Lisence: MIT
-# Author: eSirPlayground
-# Youtube Channel: https://goo.gl/fvkdwm 
-#=================================================
-
-name: Build_rockpi_4b
+name: Build_RockPi_4b
 
 on: 
   release:
     types: [published]
 
-  push:
-    branches: 
-      - master
+  #push:
+  #  branches: 
+  #    - master
 
   #schedule:
   #  - cron: 0 8 * * 5
@@ -22,42 +15,23 @@ on:
   #  types: [started]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  OpenWrt-18_06:
+    runs-on: ubuntu-18.04
     steps:
-    - name: Checkout
+    - name: Checkout Repository
       uses: actions/checkout@master
-
-    - name: Clone source code
-      env: 
-        REPO_URL: https://github.com/radxa/rockchip-bsp.git
-        REPO_BRANCH: master
-      run: |
-        git clone --depth 1 $REPO_URL -b $REPO_BRANCH rockchip-bsp
-        cd rockchip-bsp
-        git submodule init
-        git submodule update
-        
-    - name: Build firmware
+    - name: Init Building Dependencies
       env:
-        ARCH: arm64
-        RELEASE: buster
-        TARGET: desktop
-      working-directory: ./rockchip-bsp
+        DEBIAN_FRONTEND: noninteractive
       run: |
-         ./build/mk-uboot.sh rockpi4b
-         ./build/mk-kernel.sh rockpi4b
-         cd rootfs
-         sudo -E dpkg -i ubuntu-build-service/packages/*
-         sudo -E apt-get install -f
-         ./mk-base-debian.sh
-         cd ..
-         build/mk-image.sh -c rk3399 -t system -r rootfs/linaro-rootfs.img
-         build/mk-image.sh -c rk3399 -b rockpi4 -t system -r rootfs/linaro-rootfs.img
-
-    - name : Upload artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: rockpi4b-debian
-        path: rockchip-bsp/out
+        docker rmi $(docker images -q)
+        sudo -E apt-get remove -y --purge azure-cli ghc zulu* hhvm llvm* firefox google* dotnet* powershell mysql* php* mssql-tools msodbcsql17 android*
+        sudo -E apt-get update -y
+        sudo -E apt-get full-upgrade -y
+        sudo -E apt-get install -y build-essential asciidoc binutils bzip2 coreutils gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-8 gcc++-8 gcc-8-multilib g++-8-multilib p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python python3 python-pip python3-pip python-ply python3-ply haveged lrzsz device-tree-compiler scons antlr3 gperf ecj fastjar re2c xz-utils tar
+        for i in $(ls /usr/bin/*-8); do sudo -E ln -sf $i ${i%%-8*}; done
+        sudo -E ln -sf /usr/include/asm-generic /usr/include/asm
+        sudo -E apt-get autoremove -y --purge
+        sudo -E apt-get clean -y
+        sudo -E swapoff -a
+        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /usr/local/lib/android /opt/ghc /swapfile
