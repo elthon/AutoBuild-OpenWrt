@@ -23,7 +23,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu:16.04
 
     steps:
     - name: Checkout
@@ -36,13 +36,12 @@ jobs:
         LANGUAGE: en_US:en
         LC_ALL: en_US.UTF-8
       run: |
-        docker rmi `docker images -q`
-        echo "Deleting files, please wait ..."
-        sudo -E apt-get auto-remove 
-        sudo -E apt-get clean
-        sudo -E apt-get update
-        sudo -E apt-get upgrade
-        sudo -E apt-get install -y apt-utils automake bc binfmt-support bison build-essential ca-certificates ccache  cmake cpio  crossbuild-essential-arm64 curl device-tree-compiler devscripts dh-exec dh-make dosfstools dpkg-dev fakeroot flex gcc-aarch64-linux-gnu gdisk git kmod libncurses5 libncurses5-dev libssl-dev locales mtools parted pkg-config pv python python3-dev python-dev qemu-user-static sudo swig udev live-build
+        echo "Update and Install software ..."
+        sudo apt-get auto-remove 
+        sudo apt-get clean
+        sudo apt-get update
+        sudo apt-get upgrade
+        sudo apt-get install -y apt-utils automake bc binfmt-support bison build-essential ca-certificates ccache  cmake cpio  crossbuild-essential-arm64 curl device-tree-compiler devscripts dh-exec dh-make dosfstools dpkg-dev fakeroot flex gcc-aarch64-linux-gnu gdisk git kmod libncurses5 libncurses5-dev libssl-dev locales mtools parted pkg-config pv python python3-dev python-dev qemu-user-static swig udev live-build
         sudo rm -rf /var/lib/apt/lists/*
         locale-gen en_US.UTF-8
 
