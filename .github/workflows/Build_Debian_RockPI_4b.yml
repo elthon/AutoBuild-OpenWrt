@@ -1,0 +1,140 @@
+#=================================================
+# Description: Build OpenWrt using GitHub Actions
+# Lisence: MIT
+# Author: eSirPlayground
+# Youtube Channel: https://goo.gl/fvkdwm 
+#=================================================
+
+name: Build_rockpi_4b
+
+on: 
+  release:
+    types: [published]
+
+  push:
+    branches: 
+      - master
+
+  #schedule:
+  #  - cron: 0 8 * * 5
+  
+  #watch:
+  #  types: [started]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+        LANG: en_US.UTF-8
+        LANGUAGE: en_US:en
+        LC_ALL: en_US.UTF-8
+      run: |
+        docker rmi `docker images -q`
+        echo "Deleting files, please wait ..."
+        echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse" > /etc/apt/sources.list
+        echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse" >> /etc/apt/sources.list
+        echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse" >> /etc/apt/sources.list
+        echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse" >> /etc/apt/sources.list
+        sudo rm -rf \
+          /usr/share/dotnet \
+          /etc/mysql \
+          /etc/php
+        sudo -E apt-get -y purge \
+          azure-cli \
+          ghc* \
+          zulu* \
+          hhvm \
+          llvm* \
+          firefox \
+          google* \
+          dotnet* \
+          powershell \
+          openjdk* \
+          mysql* \
+          php*
+        sudo -E apt-get update
+        sudo -E apt-get install -y --no-install-recommends \
+        apt-utils \
+        automake \
+        bc \
+        binfmt-support \
+        bison \
+        build-essential \
+        ca-certificates \
+        ccache \
+        cmake \
+        cpio \ 
+        crossbuild-essential-arm64 \
+        curl \
+        device-tree-compiler \
+        devscripts \
+        dh-exec \
+        dh-make \
+        dosfstools \
+        dpkg-dev \
+        fakeroot \
+        flex \
+        gcc-aarch64-linux-gnu \
+        gdisk \
+        git \
+        kmod \
+        libncurses5 \
+        libncurses5-dev \
+        libssl-dev \
+        locales \
+        mtools \
+        parted \
+        pkg-config \
+        pv \
+        python \
+        python3-dev \
+        python-dev \
+        qemu-user-static \
+        sudo \
+        swig \
+        udev \
+        live-build
+        sudo -E apt-get -y autoremove --purge
+        sudo -E apt-get clean
+        sudo rm -rf /var/lib/apt/lists/*
+        locale-gen en_US.UTF-8
+
+    - name: Clone source code
+      env: 
+        REPO_URL: https://github.com/radxa/rockchip-bsp.git
+        REPO_BRANCH: master
+      run: |
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH rockchip-bsp
+        cd rockchip-bsp
+        git submodule init
+        git submodule update
+        
+    - name: Build firmware
+      env:
+        ARCH: arm64
+        RELEASE: buster
+        TARGET: desktop
+      working-directory: ./rockchip-bsp
+      run: |
+         ./build/mk-uboot.sh rockpi4b
+         ./build/mk-kernel.sh rockpi4b
+         cd rootfs
+         sudo -E dpkg -i ubuntu-build-service/packages/*
+         sudo -E apt-get install -f
+         ./mk-base-debian.sh
+         cd ..
+         build/mk-image.sh -c rk3399 -t system -r rootfs/linaro-rootfs.img
+         build/mk-image.sh -c rk3399 -b rockpi4 -t system -r rootfs/linaro-rootfs.img
+
+    - name : Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: rockpi4b-debian
+        path: rockchip-bsp/out
