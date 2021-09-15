@@ -37,11 +37,9 @@ jobs:
         LC_ALL: en_US.UTF-8
       run: |
         echo "Update and Install software ..."
-        sudo apt-get auto-remove 
-        sudo apt-get clean
-        sudo apt-get update
-        sudo apt-get upgrade
-        sudo apt-get install -y apt-utils automake bc binfmt-support bison build-essential ca-certificates ccache  cmake cpio  crossbuild-essential-arm64 device-tree-compiler devscripts gcc-aarch64-linux-gnu gdisk libncurses5 libncurses5-dev libssl-dev locales mtools parted pkg-config qemu-user-static
+        wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+        sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
+        sudo apt-get install gcc-aarch64-linux-gnu device-tree-compiler libncurses5 libncurses5-dev build-essential libssl-dev mtools bc python dosfstools
         sudo rm -rf /var/lib/apt/lists/*
         locale-gen en_US.UTF-8
 
