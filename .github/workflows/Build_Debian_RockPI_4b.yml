@@ -41,7 +41,7 @@ jobs:
         sudo apt-get clean
         sudo apt-get update
         sudo apt-get upgrade
-        sudo apt-get install -y apt-utils automake bc binfmt-support bison build-essential ca-certificates ccache  cmake cpio  crossbuild-essential-arm64 curl device-tree-compiler devscripts dh-exec dh-make dosfstools dpkg-dev fakeroot flex gcc-aarch64-linux-gnu gdisk git kmod libncurses5 libncurses5-dev libssl-dev locales mtools parted pkg-config pv python python3-dev python-dev qemu-user-static swig udev live-build
+        sudo apt-get install -y apt-utils automake bc binfmt-support bison build-essential ca-certificates ccache  cmake cpio  crossbuild-essential-arm64 device-tree-compiler devscripts gcc-aarch64-linux-gnu gdisk libncurses5 libncurses5-dev libssl-dev locales mtools parted pkg-config qemu-user-static
         sudo rm -rf /var/lib/apt/lists/*
         locale-gen en_US.UTF-8
 
