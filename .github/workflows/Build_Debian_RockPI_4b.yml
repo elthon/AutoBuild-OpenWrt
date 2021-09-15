@@ -45,7 +45,7 @@ jobs:
         cd rockchip-bsp
         git submodule init
         git submodule update
-        wget "https://launchpad.net/ubuntu/+archive/primary/+files/python-support_1.0.15_all.deb" -O /home/runner/rockchip-bsp/rootfs/ubuntu-build-service/packages/python-support_1.0.15_all.deb
+        wget "https://launchpadlibrarian.net/109052632/python-support_1.0.15_all.deb" -O /home/runner/rockchip-bsp/rootfs/ubuntu-build-service/packages/python-support_1.0.15_all.deb
     - name: Build firmware For uboot
       env:
         ARCH: arm64
