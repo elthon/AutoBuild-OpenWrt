@@ -45,7 +45,7 @@ jobs:
         cd rockchip-bsp
         git submodule init
         git submodule update
-    - name: Build firmware
+    - name: Build firmware For uboot
       env:
         ARCH: arm64
         RELEASE: buster
@@ -53,13 +53,40 @@ jobs:
       working-directory: /home/runner/rockchip-bsp
       run: |
          ./build/mk-uboot.sh rockpi4b
+    - name: Build firmware  For kernel
+      env:
+        ARCH: arm64
+        RELEASE: buster
+        TARGET: desktop
+      working-directory: /home/runner/rockchip-bsp
+      run: |
          ./build/mk-kernel.sh rockpi4b
+    - name: Build firmware  For rootfs
+      env:
+        ARCH: arm64
+        RELEASE: buster
+        TARGET: desktop
+      working-directory: /home/runner/rockchip-bsp
+      run: |
          cd rootfs
          sudo -E dpkg -i ubuntu-build-service/packages/*
          sudo -E apt-get install -f
          ./mk-base-debian.sh
-         cd ..
+    - name: Build firmware  For boot image
+      env:
+        ARCH: arm64
+        RELEASE: buster
+        TARGET: desktop
+      working-directory: /home/runner/rockchip-bsp
+      run: |
          ./build/mk-image.sh -c rk3399 -t system -r rootfs/linaro-rootfs.img
+    - name: Build firmware  For system image
+      env:
+        ARCH: arm64
+        RELEASE: buster
+        TARGET: desktop
+      working-directory: /home/runner/rockchip-bsp
+      run: |
          ./build/mk-image.sh -c rk3399 -b rockpi4 -t system -r rootfs/linaro-rootfs.img
     - name: Upload
       uses: actions/upload-artifact@master
