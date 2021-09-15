@@ -35,3 +35,34 @@ jobs:
         sudo -E apt-get clean -y
         sudo -E swapoff -a
         sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /usr/local/lib/android /opt/ghc /swapfile
+    - name: Clone source code
+      env: 
+        REPO_URL: https://github.com/radxa/rockchip-bsp.git
+        REPO_BRANCH: master
+      run: |
+        cd "/home/runner"
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH rockchip-bsp
+        cd rockchip-bsp
+        git submodule init
+        git submodule update
+    - name: Build firmware
+      env:
+        ARCH: arm64
+        RELEASE: buster
+        TARGET: desktop
+      working-directory: /home/runner/rockchip-bsp
+      run: |
+         ./build/mk-uboot.sh rockpi4b
+         ./build/mk-kernel.sh rockpi4b
+         cd rootfs
+         sudo -E dpkg -i ubuntu-build-service/packages/*
+         sudo -E apt-get install -f
+         ./mk-base-debian.sh
+         cd ..
+         ./build/mk-image.sh -c rk3399 -t system -r rootfs/linaro-rootfs.img
+         ./build/mk-image.sh -c rk3399 -b rockpi4 -t system -r rootfs/linaro-rootfs.img
+    - name: Upload
+      uses: actions/upload-artifact@master
+      with:
+        name: RockPi
+        path: /home/runner/rockchip-bsp/out
