@@ -28,7 +28,7 @@ jobs:
         sudo -E apt-get remove -y --purge azure-cli ghc zulu* hhvm llvm* firefox google* dotnet* powershell mysql* php* mssql-tools msodbcsql17 android*
         sudo -E apt-get update -y
         sudo -E apt-get full-upgrade -y
-        sudo -E apt-get install -y gcc-aarch64-linux-gnu device-tree-compiler libncurses5 libncurses5-dev build-essential libssl-dev mtools bc python dosfstools python-dbus python-debian python-yaml u-boot-tools
+        sudo -E apt-get install -y gcc-aarch64-linux-gnu device-tree-compiler libncurses5 libncurses5-dev build-essential libssl-dev mtools bc python dosfstools python-dbus python-debian python-yaml u-boot-tools live-build qemu-user-static
         for i in $(ls /usr/bin/*-8); do sudo -E ln -sf $i ${i%%-8*}; done
         sudo -E ln -sf /usr/include/asm-generic /usr/include/asm
         sudo -E apt-get autoremove -y --purge
