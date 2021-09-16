@@ -73,14 +73,7 @@ jobs:
          sudo -E dpkg -i ubuntu-build-service/packages/*
          sudo -E apt-get install -f
          ./mk-base-debian.sh
-    - name: Build firmware  For boot image
-      env:
-        ARCH: arm64
-        RELEASE: buster
-        TARGET: desktop
-      working-directory: /home/runner/rockchip-bsp
-      run: |
-         ./build/mk-image.sh -c rk3399 -t system -r rootfs/linaro-rootfs.img
+         ./mk-image.sh
     - name: Build firmware  For system image
       env:
         ARCH: arm64
